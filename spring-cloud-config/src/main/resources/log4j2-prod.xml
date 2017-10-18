@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
+<!--shutdownHook:指定当JVM停止的时候，Log4j是否应该停止。停止钩子默认是启用的，也可以通过设置这个属性点值为disable来禁用它，这样我们就可以完全记录应用的整个生命周期。-->
+<Configuration status="WARN" monitoringInterval="300" shutdownHook="disable">
+    <Properties>
+        <Property name="log-path">logs</Property>
+        <Property name="root">logs/logger.log</Property>
+        <Property name="service">logs/service.log</Property>
+    </Properties>
+    <Appenders>
+        <!--控制台日志输出设置 start-->
+        <Console name="to-console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] -- [%p] -- [%thread >>>> %F:%L >>>> Method = %M] -- [Content = %m]%n"/>
+        </Console>
+        <!--控制台日志输出设置 end-->
+        <!--文件日志输出设置 start-->
+        <RollingFile name="to-file-1" fileName="${root}" append="true" filePattern="${log-path}/$${date:yyyy-MM}/logger-%d{dd-MM-yyyy_HH-mm-ss}-%i.log">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] -- [%p] -- [%thread >>>> %F:%L >>>> Method = %M] -- [Content = %m]%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+
+        <RollingFile name="to-file-2" fileName="${service}" append="true" filePattern="${log-path}/$${date:yyyy-MM}/logger-%d{dd-MM-yyyy_HH-mm-ss}-%i.log">
+            <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}] -- [%p] -- [%thread >>>> %F:%L >>>> Method = %M] -- [Content = %m]%n"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+        </RollingFile>
+        <!--文件日志输出设置 end-->
+    </Appenders>
+    <!--监控日志的位置设置 start-->
+    <Loggers>
+        <Root level="warn">
+            <AppenderRef ref="to-console"/>
+        </Root>
+        <Logger name="org.springframework" level="debug" additivity="false">
+            <AppenderRef ref="to-file-1"/>
+        </Logger>
+        <Logger name="org.gitnavi" level="debug" additivity="false">
+            <AppenderRef ref="to-file-2"/>
+        </Logger>
+    </Loggers>
+    <!--监控日志的位置设置 end-->
+</Configuration>
